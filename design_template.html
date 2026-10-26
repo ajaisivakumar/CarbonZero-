@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonZero AI Agent - UI Design Template</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f0; display: flex; height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px; background: #1b5e20; color: white;
+            display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
+        }
+        .sidebar-logo { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+        .sidebar-caption { font-size: 0.75rem; color: #a5d6a7; margin-bottom: 20px; }
+        .sidebar img { border-radius: 10px; width: 100%; margin-bottom: 16px; height: 120px; object-fit: cover; background: #2e7d32; }
+        .sidebar-section { font-size: 0.8rem; font-weight: 600; color: #81c784; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+        .sidebar-radio { display: flex; flex-direction: column; gap: 8px; }
+        .radio-opt {
+            padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 8px;
+            font-size: 0.85rem; cursor: pointer; transition: background 0.2s;
+        }
+        .radio-opt.active { background: #43a047; }
+        .slider-wrap { margin-top: 8px; }
+        .slider-label { font-size: 0.8rem; color: #c8e6c9; margin-bottom: 6px; }
+        .slider { width: 100%; accent-color: #81c784; }
+        .badge {
+            margin-top: 20px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 12px; font-size: 0.78rem; color: #c8e6c9;
+        }
+        .badge strong { color: #fff; }
+
+        /* MAIN CONTENT */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        .header { background: white; padding: 18px 28px 10px; border-bottom: 1px solid #e0e0e0; }
+        .header h1 { font-size: 1.5rem; font-weight: 700; color: #1b5e20; }
+        .header p { font-size: 0.82rem; color: #607d8b; margin-top: 2px; }
+
+        /* TABS */
+        .tabs { display: flex; background: white; padding: 0 28px; border-bottom: 2px solid #e8f5e9; gap: 4px; }
+        .tab {
+            padding: 10px 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+            color: #607d8b; border-bottom: 3px solid transparent; margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab.active { color: #2e7d32; border-bottom-color: #2e7d32; }
+
+        /* CONTENT AREA */
+        .content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+        /* KPI CARDS */
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card {
+            background: white; border-radius: 12px; padding: 18px 20px;
+            border-left: 5px solid #2e7d32; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .kpi-card.red { border-left-color: #e53935; }
+        .kpi-card.blue { border-left-color: #1976d2; }
+        .kpi-card.orange { border-left-color: #f57c00; }
+        .kpi-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #558b2f; }
+        .kpi-card.red .kpi-label { color: #e53935; }
+        .kpi-card.blue .kpi-label { color: #1976d2; }
+        .kpi-card.orange .kpi-label { color: #f57c00; }
+        .kpi-value { font-size: 1.9rem; font-weight: 800; color: #1b5e20; margin: 4px 0 2px; }
+        .kpi-card.red .kpi-value { color: #c62828; }
+        .kpi-card.blue .kpi-value { color: #0d47a1; }
+        .kpi-card.orange .kpi-value { color: #e65100; }
+        .kpi-sub { font-size: 0.76rem; color: #888; }
+
+        /* CHART ROW */
+        .chart-row { display: grid; grid-template-columns: 1fr 1.7fr; gap: 16px; margin-bottom: 24px; }
+        .chart-card { background: white; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .chart-title { font-size: 0.9rem; font-weight: 700; color: #333; margin-bottom: 14px; }
+
+        /* DONUT CHART SVG */
+        .donut-wrap { display: flex; align-items: center; gap: 20px; }
+        .legend { display: flex; flex-direction: column; gap: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #555; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+        /* BAR CHART MONTHLY */
+        .month-bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 10px; }
+        .month-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+        .bar-stack { display: flex; flex-direction: column-reverse; width: 100%; gap: 1px; }
+        .bar-seg { width: 100%; border-radius: 2px 2px 0 0; }
+        .month-label { font-size: 0.55rem; color: #999; margin-top: 4px; }
+
+        /* HOTSPOT ROW */
+        .bottom-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
+        .hotspot-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .hotspot-item { display: flex; align-items: center; gap: 10px; }
+        .hotspot-label { font-size: 0.76rem; color: #555; width: 200px; flex-shrink: 0; text-align: right; }
+        .hotspot-bar-wrap { flex: 1; background: #f5f5f5; border-radius: 4px; height: 16px; overflow: hidden; }
+        .hotspot-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ef5350, #e53935); }
+        .hotspot-val { font-size: 0.72rem; font-weight: 600; color: #c62828; width: 50px; }
+
+        .energy-metrics { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+        .energy-item { background: #f9fbe7; border-radius: 8px; padding: 12px 14px; }
+        .energy-lbl { font-size: 0.72rem; color: #558b2f; font-weight: 600; }
+        .energy-val { font-size: 1.2rem; font-weight: 700; color: #1b5e20; }
+        .energy-sub { font-size: 0.7rem; color: #81c784; }
+
+        /* EV SIMULATOR TAB */
+        .ev-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
+        .control-panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .control-panel h3 { font-size: 0.95rem; font-weight: 700; color: #333; margin-bottom: 16px; }
+        .control-group { margin-bottom: 16px; }
+        .control-label { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 4px; }
+        .control-input {
+            width: 100%; padding: 8px 12px; border: 1.5px solid #e0e0e0;
+            border-radius: 8px; font-size: 0.85rem; color: #333; background: #fafafa;
+        }
+        .result-panel { display: flex; flex-direction: column; gap: 16px; }
+        .result-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .result-card { background: white; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+        .result-label { font-size: 0.7rem; color: #888; font-weight: 600; text-transform: uppercase; }
+        .result-value { font-size: 1.3rem; font-weight: 800; color: #1b5e20; margin: 4px 0; }
+        .result-sub { font-size: 0.7rem; color: #aaa; }
+        .cost-compare { background: white; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .cost-bars { display: flex; gap: 30px; align-items: flex-end; height: 120px; padding: 10px 30px 0; }
+        .cost-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+        .cost-bar { width: 60%; border-radius: 6px 6px 0 0; }
+        .cost-lbl { font-size: 0.72rem; color: #666; text-align: center; }
+
+        /* AI AGENT TAB */
+        .agent-grid { display: flex; flex-direction: column; gap: 16px; }
+        .quick-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .quick-btn {
+            padding: 8px 16px; background: #e8f5e9; border: 1.5px solid #a5d6a7;
+            border-radius: 20px; font-size: 0.82rem; color: #2e7d32; font-weight: 600; cursor: pointer;
+        }
+        .chat-window { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); min-height: 320px; }
+        .chat-msg { display: flex; gap: 12px; margin-bottom: 18px; }
+        .chat-msg.user { flex-direction: row-reverse; }
+        .chat-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: #2e7d32;
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-size: 1rem; flex-shrink: 0;
+        }
+        .chat-msg.user .chat-avatar { background: #1976d2; }
+        .chat-bubble {
+            background: #f1f8e9; border-radius: 12px 12px 12px 2px;
+            padding: 12px 16px; max-width: 75%; font-size: 0.84rem; color: #333; line-height: 1.5;
+        }
+        .chat-msg.user .chat-bubble { background: #e3f2fd; border-radius: 12px 12px 2px 12px; }
+        .chat-input-row { display: flex; gap: 10px; margin-top: 12px; }
+        .chat-input {
+            flex: 1; padding: 10px 16px; border: 1.5px solid #c8e6c9; border-radius: 24px;
+            font-size: 0.85rem; color: #333; outline: none;
+        }
+        .chat-send {
+            padding: 10px 22px; background: #2e7d32; color: white;
+            border-radius: 24px; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer;
+        }
+
+        /* REPORT TAB */
+        .report-body { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .report-header { border-bottom: 2px solid #e8f5e9; padding-bottom: 16px; margin-bottom: 20px; }
+        .report-title { font-size: 1.3rem; font-weight: 800; color: #1b5e20; }
+        .report-meta { font-size: 0.78rem; color: #888; margin-top: 4px; }
+        .report-section { margin-bottom: 20px; }
+        .report-section h3 { font-size: 0.95rem; font-weight: 700; color: #333; margin-bottom: 10px; }
+        .report-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .report-table th { background: #e8f5e9; color: #2e7d32; padding: 8px 12px; text-align: left; font-weight: 700; }
+        .report-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; color: #555; }
+        .report-table tr:last-child td { border-bottom: none; font-weight: 700; color: #1b5e20; background: #f9fbe7; }
+        .download-row { display: flex; gap: 12px; margin-top: 20px; }
+        .dl-btn {
+            padding: 10px 24px; border-radius: 8px; font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; border: none;
+        }
+        .dl-btn.primary { background: #2e7d32; color: white; }
+        .dl-btn.secondary { background: #e3f2fd; color: #1976d2; }
+
+        /* TAB SWITCHING */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div style="background: linear-gradient(135deg,#388e3c,#1b5e20); border-radius: 10px; height: 120px; display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <span style="font-size: 3rem;">🌱</span>
+    </div>
+    <div class="sidebar-logo">🌱 CarbonZero</div>
+    <div class="sidebar-caption">AI Carbon Auditor & EV Copilot</div>
+    <hr style="border-color: rgba(255,255,255,0.15); margin-bottom:16px;">
+
+    <div class="sidebar-section">📁 Data Source</div>
+    <div class="sidebar-radio">
+        <div class="radio-opt active">🏫 Preloaded Campus Dataset</div>
+        <div class="radio-opt">📤 Upload Custom CSV</div>
+    </div>
+
+    <div class="sidebar-section">⚙️ Grid Parameters</div>
+    <div class="slider-wrap">
+        <div class="slider-label">Grid Emission Factor: 0.713 kg CO₂e/kWh</div>
+        <input type="range" class="slider" min="20" max="95" value="71">
+    </div>
+
+    <div class="badge">
+        <strong>🏆 Edunet Project Showcase</strong><br><br>
+        Theme: Green Skills & EV Innovation<br><br>
+        Standards: GHG Protocol & ISO 14064
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🌱 CarbonZero: Autonomous Sustainability & EV Agent</h1>
+        <p>GHG Protocol Scope 1-2-3 Carbon Accounting • EV Fleet Electrification Simulator • Green Skills Advisor</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('dashboard', this)">📊 Executive Dashboard</div>
+        <div class="tab" onclick="showTab('ev', this)">⚡ EV Fleet & Solar Simulator</div>
+        <div class="tab" onclick="showTab('agent', this)">🤖 CarbonZero AI Agent</div>
+        <div class="tab" onclick="showTab('report', this)">📑 Sustainability Audit Report</div>
+    </div>
+
+    <!-- ======================= TAB 1: DASHBOARD ======================= -->
+    <div class="content">
+        <div id="dashboard" class="tab-content active">
+            <!-- KPI CARDS -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Emissions</div>
+                    <div class="kpi-value">1,247 <span style="font-size:0.9rem;color:#558b2f;">tCO₂e</span></div>
+                    <div class="kpi-sub">Annual Scope 1 + 2 + 3</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">Scope 1 (Direct)</div>
+                    <div class="kpi-value">342 <span style="font-size:0.9rem;">tCO₂e</span></div>
+                    <div class="kpi-sub"><b>27.4%</b> of total footprint</div>
+                </div>
+                <div class="kpi-card blue">
+                    <div class="kpi-label">Scope 2 (Electricity)</div>
+                    <div class="kpi-value">618 <span style="font-size:0.9rem;">tCO₂e</span></div>
+                    <div class="kpi-sub"><b>49.6%</b> of total footprint</div>
+                </div>
+                <div class="kpi-card orange">
+                    <div class="kpi-label">Scope 3 (Value Chain)</div>
+                    <div class="kpi-value">287 <span style="font-size:0.9rem;">tCO₂e</span></div>
+                    <div class="kpi-sub"><b>23.0%</b> of total footprint</div>
+                </div>
+            </div>
+
+            <!-- CHARTS ROW -->
+            <div class="chart-row">
+                <!-- DONUT CHART -->
+                <div class="chart-card">
+                    <div class="chart-title">🍩 Emissions by Scope</div>
+                    <div class="donut-wrap">
+                        <svg width="130" height="130" viewBox="0 0 42 42">
+                            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#e53935" stroke-width="6"
+                                stroke-dasharray="27.4 72.6" stroke-dashoffset="25" />
+                            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#1e88e5" stroke-width="6"
+                                stroke-dasharray="49.6 50.4" stroke-dashoffset="-2.4" />
+                            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#fb8c00" stroke-width="6"
+                                stroke-dasharray="23 77" stroke-dashoffset="-52" />
+                            <circle cx="21" cy="21" r="11" fill="white"/>
+                            <text x="21" y="23" text-anchor="middle" font-size="4" fill="#1b5e20" font-weight="bold">1,247</text>
+                            <text x="21" y="27" text-anchor="middle" font-size="2.5" fill="#888">tCO₂e</text>
+                        </svg>
+                        <div class="legend">
+                            <div class="legend-item"><div class="legend-dot" style="background:#e53935"></div> Scope 1 (Direct) — 27.4%</div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#1e88e5"></div> Scope 2 (Electricity) — 49.6%</div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#fb8c00"></div> Scope 3 (Value Chain) — 23.0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MONTHLY BAR CHART -->
+                <div class="chart-card">
+                    <div class="chart-title">📈 Monthly Emissions Trajectory (tCO₂e)</div>
+                    <div class="month-bars">
+                        <!-- Heights normalized for visual -->
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:22px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:44px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:24px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Jan</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:20px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:41px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:22px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Feb</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:25px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:52px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:27px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Mar</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:22px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:64px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:28px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Apr</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:19px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:74px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:30px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">May</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:21px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:68px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:31px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Jun</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:22px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:62px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:29px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Jul</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:22px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:58px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:27px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Aug</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:24px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:54px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:26px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Sep</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:25px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:48px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:25px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Oct</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:23px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:44px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:23px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Nov</div>
+                        </div>
+                        <div class="month-col">
+                            <div class="bar-stack">
+                                <div class="bar-seg" style="height:21px;background:#fb8c00;"></div>
+                                <div class="bar-seg" style="height:42px;background:#1e88e5;"></div>
+                                <div class="bar-seg" style="height:22px;background:#e53935;"></div>
+                            </div>
+                            <div class="month-label">Dec</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:16px;margin-top:10px;">
+                        <div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#555;"><span style="display:inline-block;width:10px;height:10px;background:#e53935;border-radius:2px;"></span>Scope 1</div>
+                        <div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#555;"><span style="display:inline-block;width:10px;height:10px;background:#1e88e5;border-radius:2px;"></span>Scope 2</div>
+                        <div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#555;"><span style="display:inline-block;width:10px;height:10px;background:#fb8c00;border-radius:2px;"></span>Scope 3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOTSPOT ROW -->
+            <div class="bottom-row">
+                <div class="chart-card">
+                    <div class="chart-title">🔥 Ranked Emission Hotspots</div>
+                    <div class="hotspot-bars">
+                        <div class="hotspot-item">
+                            <div class="hotspot-label">Scope 2 - Grid Electricity</div>
+                            <div class="hotspot-bar-wrap"><div class="hotspot-bar" style="width:100%;background:linear-gradient(90deg,#ef5350,#b71c1c);"></div></div>
+                            <div class="hotspot-val">607.4</div>
+                        </div>
+                        <div class="hotspot-item">
+                            <div class="hotspot-label">Scope 3 - Employee Commute</div>
+                            <div class="hotspot-bar-wrap"><div class="hotspot-bar" style="width:60%;"></div></div>
+                            <div class="hotspot-val">228.3</div>
+                        </div>
+                        <div class="hotspot-item">
+                            <div class="hotspot-label">Scope 1 - Fleet Diesel</div>
+                            <div class="hotspot-bar-wrap"><div class="hotspot-bar" style="width:45%;"></div></div>
+                            <div class="hotspot-val">168.6</div>
+                        </div>
+                        <div class="hotspot-item">
+                            <div class="hotspot-label">Scope 1 - Diesel Generator</div>
+                            <div class="hotspot-bar-wrap"><div class="hotspot-bar" style="width:25%;"></div></div>
+                            <div class="hotspot-val">96.4</div>
+                        </div>
+                        <div class="hotspot-item">
+                            <div class="hotspot-label">Scope 3 - Business Flights</div>
+                            <div class="hotspot-bar-wrap"><div class="hotspot-bar" style="width:17%;"></div></div>
+                            <div class="hotspot-val">66.2</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">☀️ Clean Energy Share</div>
+                    <div class="energy-metrics">
+                        <div class="energy-item">
+                            <div class="energy-lbl">SOLAR GENERATION</div>
+                            <div class="energy-val">268,400 kWh</div>
+                            <div class="energy-sub">✅ 22.1% of total campus power</div>
+                        </div>
+                        <div class="energy-item" style="background:#fff3e0;">
+                            <div class="energy-lbl" style="color:#f57c00;">GRID ELECTRICITY</div>
+                            <div class="energy-val" style="color:#e65100;">1,125,300 kWh</div>
+                            <div class="energy-sub" style="color:#ffcc80;">Primary power source</div>
+                        </div>
+                        <div class="energy-item" style="background:#fce4ec;">
+                            <div class="energy-lbl" style="color:#e53935;">FLEET EMISSIONS</div>
+                            <div class="energy-val" style="color:#c62828;">211 tCO₂e</div>
+                            <div class="energy-sub" style="color:#ef9a9a;">16.9% of total footprint</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= TAB 2: EV SIMULATOR ======================= -->
+        <div id="ev" class="tab-content">
+            <h3 style="color:#1b5e20;margin-bottom:6px;">⚡ Interactive EV Fleet Transition & Microgrid Simulator</h3>
+            <p style="color:#607d8b;font-size:0.85rem;margin-bottom:18px;">Evaluate decarbonization impact, fuel savings, charging infrastructure needs, and financial payback of transitioning campus ICE vehicles to electric fleets.</p>
+            <div class="ev-grid">
+                <div class="control-panel">
+                    <h3>🎛️ Simulation Controls</h3>
+                    <div class="control-group">
+                        <div class="control-label">Total ICE Fleet Vehicles</div>
+                        <input class="control-input" type="number" value="30">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Fleet Electrification Target: <strong>60%</strong></div>
+                        <input type="range" style="width:100%;accent-color:#2e7d32;" min="0" max="100" value="60">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Average Annual km / Vehicle</div>
+                        <input class="control-input" type="number" value="25000">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Fuel Price (₹/Liter)</div>
+                        <input class="control-input" type="number" value="96">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Solar PV Powered Charging: <strong>40%</strong></div>
+                        <input type="range" style="width:100%;accent-color:#43a047;" min="0" max="100" value="40">
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Commercial Grid Tariff (₹/kWh)</div>
+                        <input class="control-input" type="number" value="7.5">
+                    </div>
+                </div>
+                <div class="result-panel">
+                    <div style="font-size:1rem;font-weight:700;color:#1b5e20;">🎯 Impact for 18 Electric Vehicles (60% Fleet)</div>
+                    <div class="result-kpis">
+                        <div class="result-card">
+                            <div class="result-label">🌱 CO₂e Saved / Year</div>
+                            <div class="result-value">87.3 tCO₂e</div>
+                            <div class="result-sub">-68.4% fleet CO₂</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">💰 Net Annual Savings</div>
+                            <div class="result-value">₹8.4L</div>
+                            <div class="result-sub">Fuel + Maintenance</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">⏱️ Payback Period</div>
+                            <div class="result-value">4.1 Years</div>
+                            <div class="result-sub">8-Yr ROI: 104%</div>
+                        </div>
+                    </div>
+                    <div class="cost-compare chart-card">
+                        <div class="chart-title">💵 Annual Operating Cost Comparison (₹)</div>
+                        <div class="cost-bars">
+                            <div class="cost-bar-wrap">
+                                <div style="font-size:0.7rem;color:#888;margin-bottom:4px;text-align:center;">₹14.6 Lakhs</div>
+                                <div class="cost-bar" style="height:100px;background:#ef5350;border-radius:6px;width:70%;"></div>
+                                <div class="cost-lbl" style="margin-top:6px;">ICE Fuel & Maintenance</div>
+                            </div>
+                            <div class="cost-bar-wrap">
+                                <div style="font-size:0.7rem;color:#888;margin-bottom:4px;text-align:center;">₹6.2 Lakhs</div>
+                                <div class="cost-bar" style="height:42px;background:#66bb6a;border-radius:6px;width:70%;"></div>
+                                <div class="cost-lbl" style="margin-top:6px;">EV Charging & Maintenance</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card" style="font-size:0.85rem;line-height:2;">
+                        <div class="chart-title">🔌 Required EV Charging Infrastructure</div>
+                        <div>• <strong>Level 2 Smart AC Chargers (7.4-22kW):</strong> <strong style="color:#2e7d32;">6 units</strong> (overnight depot charging)</div>
+                        <div>• <strong>DC Fast Chargers (30-60kW):</strong> <strong style="color:#2e7d32;">1 unit</strong> (rapid daytime turnaround)</div>
+                        <div>• <strong>Total Infrastructure CapEx:</strong> ₹8,40,000</div>
+                        <div>• <strong>☀️ Solar Synergy Carbon Bonus:</strong> <strong style="color:#43a047;">+12.4 tCO₂e saved</strong> vs. pure grid charging!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= TAB 3: AI AGENT ======================= -->
+        <div id="agent" class="tab-content">
+            <h3 style="color:#1b5e20;margin-bottom:4px;">🤖 Autonomous CarbonZero Copilot</h3>
+            <p style="color:#607d8b;font-size:0.85rem;margin-bottom:14px;">Ask the AI agent anything about emission diagnostics, EV transition plans, or green workforce skills.</p>
+            <div class="agent-grid">
+                <div>
+                    <div style="font-size:0.85rem;font-weight:600;color:#555;margin-bottom:8px;">⚡ Quick Action Prompts:</div>
+                    <div class="quick-btns">
+                        <div class="quick-btn">🔥 Diagnose Hotspots</div>
+                        <div class="quick-btn">🚗 Simulate 75% EV Fleet</div>
+                        <div class="quick-btn">📋 Decarbonization Plan</div>
+                        <div class="quick-btn">🎓 EV & Green Skills</div>
+                    </div>
+                </div>
+                <hr style="margin:14px 0;border-color:#e8f5e9;">
+                <div class="chat-window">
+                    <div class="chat-msg">
+                        <div class="chat-avatar">🌱</div>
+                        <div class="chat-bubble">
+                            👋 Hello! I am <strong>CarbonZero</strong>, your AI Sustainability & EV Transition Copilot.<br><br>
+                            I can audit your campus/enterprise emissions (Scope 1, 2, 3), simulate EV fleet conversion scenarios, and recommend green workforce upskilling tracks.<br><br>
+                            Try asking: <em>"What are our biggest emission hotspots?"</em>
+                        </div>
+                    </div>
+                    <div class="chat-msg user">
+                        <div class="chat-avatar" style="background:#1976d2;">👤</div>
+                        <div class="chat-bubble">Simulate converting 75% of our campus fleet to EVs with solar charging</div>
+                    </div>
+                    <div class="chat-msg">
+                        <div class="chat-avatar">🌱</div>
+                        <div class="chat-bubble">
+                            <strong>⚡ EV Fleet Transition Simulation (75% Electrification)</strong><br><br>
+                            I simulated converting <strong>75%</strong> (23 out of 30 vehicles) to Electric Vehicles:<br><br>
+                            • 🌱 <strong>Carbon Avoided: 109.2 tCO₂e/year</strong> (-85.2% fleet emissions)<br>
+                            • ⛽ <strong>Fuel Saved: 1,43,750 Liters</strong> (₹13.8L savings/year)<br>
+                            • ⏱️ <strong>Payback: 3.8 Years</strong> | 8-Year ROI: <strong>138%</strong><br>
+                            • 🔌 Need: <strong>8x AC Level-2 + 1x DC Fast Charger</strong><br>
+                            • ☀️ Solar synergy avoids extra <strong>15.6 tCO₂e</strong> vs coal grid!
+                        </div>
+                    </div>
+                    <div class="chat-input-row">
+                        <input class="chat-input" type="text" placeholder="Ask CarbonZero (e.g., 'What is our Scope 2 emission?', 'Simulate 50% EV conversion')...">
+                        <button class="chat-send">Send ➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= TAB 4: AUDIT REPORT ======================= -->
+        <div id="report" class="tab-content">
+            <h3 style="color:#1b5e20;margin-bottom:4px;">📑 Official Campus Sustainability & GHG Audit Report</h3>
+            <p style="color:#607d8b;font-size:0.85rem;margin-bottom:18px;">Standardized executive report aligned with <strong>GHG Protocol</strong> & <strong>ISO 14064</strong> specifications.</p>
+            <div class="report-body">
+                <div class="report-header">
+                    <div class="report-title">🌱 Executive GHG Emissions & Decarbonization Audit Report</div>
+                    <div class="report-meta">
+                        <strong>Organization:</strong> Academic & Technology Campus &nbsp;|&nbsp;
+                        <strong>Period:</strong> 12-Month Annual Cycle &nbsp;|&nbsp;
+                        <strong>Standard:</strong> GHG Protocol Corporate Standard &nbsp;|&nbsp;
+                        <strong>Date:</strong> 2026-10-20
+                    </div>
+                </div>
+                <div class="report-section">
+                    <h3>1. Executive Summary</h3>
+                    <p style="font-size:0.85rem;color:#555;margin-bottom:12px;">During the 12-month reporting cycle, the facility generated an aggregate footprint of <strong>1,247 metric tonnes of CO₂ equivalent (tCO₂e)</strong>.</p>
+                    <table class="report-table">
+                        <tr>
+                            <th>Scope Classification</th>
+                            <th>Emissions (tCO₂e)</th>
+                            <th>Share (%)</th>
+                            <th>Primary Activity Drivers</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope 1 (Direct)</strong></td>
+                            <td>342</td>
+                            <td>27.4%</td>
+                            <td>Diesel Generators, Internal Combustion Fleet, Canteen LPG</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope 2 (Indirect)</strong></td>
+                            <td>618</td>
+                            <td>49.6%</td>
+                            <td>Purchased Grid Electricity (0.713 kg CO₂e/kWh)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope 3 (Value Chain)</strong></td>
+                            <td>287</td>
+                            <td>23.0%</td>
+                            <td>Commuter Passenger Miles, Business Travel, Solid Waste</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TOTAL</strong></td>
+                            <td><strong>1,247</strong></td>
+                            <td><strong>100.0%</strong></td>
+                            <td>—</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="report-section">
+                    <h3>2. Top Identified Hotspots</h3>
+                    <ol style="font-size:0.85rem;color:#555;padding-left:20px;line-height:2;">
+                        <li><strong>Scope 2 – Grid Electricity:</strong> 607.4 tCO₂e (48.7%)</li>
+                        <li><strong>Scope 3 – Employee Commute:</strong> 228.3 tCO₂e (18.3%)</li>
+                        <li><strong>Scope 1 – Fleet Diesel:</strong> 168.6 tCO₂e (13.5%)</li>
+                    </ol>
+                </div>
+                <div class="report-section">
+                    <h3>3. High-Impact Decarbonization Interventions</h3>
+                    <ul style="font-size:0.85rem;color:#555;padding-left:20px;line-height:2;">
+                        <li><strong>EV Fleet Electrification (60%):</strong> Abates ~137 tCO₂e/year. Payback: 3.8-4.5 years.</li>
+                        <li><strong>Rooftop Solar PV (150 kWp):</strong> Offsets grid demand and enables zero-emission EV charging.</li>
+                        <li><strong>Green Commute Incentives:</strong> Subsidized e-scooter charging reduces Scope 3 commuter emissions by 25%.</li>
+                    </ul>
+                </div>
+                <div class="download-row">
+                    <button class="dl-btn primary">📥 Download Audit Report (.md)</button>
+                    <button class="dl-btn secondary">📊 Download Audited Dataset (.csv)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(id, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+}
+</script>
+</body>
+</html>
